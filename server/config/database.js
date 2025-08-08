@@ -9,7 +9,7 @@ const connectDB = async () => {
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
-    // Create or update admin user
+    // Create admin user ONLY if it doesn't exist
     await createDefaultAdmin();
   } catch (error) {
     console.error('Database connection error:', error);
@@ -24,33 +24,31 @@ const createDefaultAdmin = async () => {
     
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const hashedPassword = await bcrypt.hash(adminPassword, 12);
     
-    // --- TEMPORARY DEBUG CHANGE: Force upsert of admin user ---
-    // This will create the admin if it doesn't exist, or update its password if it does.
-    const result = await User.findOneAndUpdate(
-      { email: adminEmail },
-      { 
+    // Check if an admin user already exists
+    const adminExists = await User.findOne({ email: adminEmail, role: 'admin' });
+    
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash(adminPassword, 12);
+      
+      await User.create({
         name: 'Admin',
+        email: adminEmail,
         password: hashedPassword,
         role: 'admin',
         isActive: true
-      },
-      { 
-        upsert: true, // Create if not found
-        new: true,    // Return the updated document
-        setDefaultsOnInsert: true // Apply defaults if creating new
-      }
-    );
-    // --- END TEMPORARY DEBUG CHANGE ---
-
-    if (result) {
-      console.log(`Default admin user ensured: ${adminEmail}. Password updated/set.`);
+      });
+      
+      console.log(`Default admin user created with email: ${adminEmail}.`);
     } else {
-      console.log('Failed to ensure default admin user.');
+      console.log('Default admin user already exists.');
+      // Optional: If you want to ensure the password is always the .env one,
+      // you could add logic here to update it if it's different, but generally
+      // for production, you'd manage passwords through the UI after initial setup.
+      // For now, we just ensure it exists.
     }
   } catch (error) {
-    console.error('Error creating/updating default admin:', error);
+    console.error('Error creating default admin:', error);
   }
 };
 
