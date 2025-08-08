@@ -1,0 +1,52 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "actions": "Acciones",
+    "status": "Estado",
+    "name": "Nombre",
+    "description": "Descripción",
+    "type": "Tipo",
+    "category": "Categoría",
+    "date": "Fecha",
+    "confirm": "Confirmar",
+    "close": "Cerrar"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "loginButton": "Entrar",
+    "invalidCredentials": "Correo o contraseña inválidos",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutSuccess": "Sesión cerrada exitosamente"
+  },
+  "navigation": {
+    "dashboard": "Panel de Control",
+    "tasks": "Tareas",
+    "itineraries": "Itinerarios",
+    "users": "Usuarios",
+    "analytics": "Analíticas",
+    "scheduler": "Programador",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "title": "Panel de Administración",
+    "overview": "Resumen",
+    "totalUsers": "Total de Usuarios",
+    "totalTasks": "Total de Tareas",
+    "totalItineraries": "Total de Itinerarios",
+    "activeCycles": "Ciclos Activos",
+    "recentActivity": "Actividad Reciente"
+  }
+}

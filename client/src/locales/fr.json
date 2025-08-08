@@ -1,0 +1,52 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "actions": "Actions",
+    "status": "Statut",
+    "name": "Nom",
+    "description": "Description",
+    "type": "Type",
+    "category": "Catégorie",
+    "date": "Date",
+    "confirm": "Confirmer",
+    "close": "Fermer"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "loginButton": "Se connecter",
+    "invalidCredentials": "Email ou mot de passe invalide",
+    "loginSuccess": "Connexion réussie",
+    "logoutSuccess": "Déconnexion réussie"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "tasks": "Tâches",
+    "itineraries": "Itinéraires",
+    "users": "Utilisateurs",
+    "analytics": "Analytiques",
+    "scheduler": "Planificateur",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "title": "Tableau de bord Admin",
+    "overview": "Aperçu",
+    "totalUsers": "Total Utilisateurs",
+    "totalTasks": "Total Tâches",
+    "totalItineraries": "Total Itinéraires",
+    "activeCycles": "Cycles Actifs",
+    "recentActivity": "Activité Récente"
+  }
+}
