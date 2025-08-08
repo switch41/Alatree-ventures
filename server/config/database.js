@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 const connectDB = async () => {
   try {
@@ -9,46 +11,49 @@ const connectDB = async () => {
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
-    // Create admin user ONLY if it doesn't exist
-    await createDefaultAdmin();
+    await createOrUpdateDefaultAdmin();
   } catch (error) {
     console.error('Database connection error:', error);
     process.exit(1);
   }
 };
 
-const createDefaultAdmin = async () => {
+const createOrUpdateDefaultAdmin = async () => {
   try {
-    const User = require('../models/User');
-    const bcrypt = require('bcryptjs');
-    
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     
-    // Check if an admin user already exists
-    const adminExists = await User.findOne({ email: adminEmail, role: 'admin' });
-    
-    if (!adminExists) {
-      const hashedPassword = await bcrypt.hash(adminPassword, 12);
-      
+    let adminUser = await User.findOne({ email: adminEmail, role: 'admin' }).select('+password');
+
+    if (!adminUser) {
+      console.log('[DEBUG] Admin user not found — creating new one.');
+
       await User.create({
         name: 'Admin',
         email: adminEmail,
-        password: hashedPassword,
+        password: adminPassword, // Let the pre-save hook hash it
         role: 'admin',
         isActive: true
       });
-      
-      console.log(`Default admin user created with email: ${adminEmail}.`);
+
+      console.log(`Default admin user created with email: ${adminEmail}`);
     } else {
-      console.log('Default admin user already exists.');
-      // Optional: If you want to ensure the password is always the .env one,
-      // you could add logic here to update it if it's different, but generally
-      // for production, you'd manage passwords through the UI after initial setup.
-      // For now, we just ensure it exists.
+      console.log('[DEBUG] Admin user already exists.');
+      console.log(`[DEBUG] Stored hash in DB: ${adminUser.password}`);
+
+      const isPasswordMatch = await bcrypt.compare(adminPassword, adminUser.password);
+
+      if (!isPasswordMatch) {
+        console.log('[DEBUG] Password mismatch — updating stored password.');
+        adminUser.password = adminPassword; // Let the pre-save hook hash it
+        await adminUser.save();
+        console.log(`Default admin user password updated for ${adminEmail}`);
+      } else {
+        console.log('[DEBUG] Password matches — no update needed.');
+      }
     }
   } catch (error) {
-    console.error('Error creating default admin:', error);
+    console.error('Error creating or updating default admin:', error);
   }
 };
 

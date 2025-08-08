@@ -13,6 +13,9 @@ const app = express();
 // Connect to database
 connectDB();
 
+// Trust proxy for rate limiting (e.g., when deployed behind a load balancer or in WebContainer)
+app.set('trust proxy', 1); // Add this line
+
 // Security middleware
 app.use(helmet());
 app.use(cors({

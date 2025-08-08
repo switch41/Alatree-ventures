@@ -24,6 +24,10 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // --- THIS IS THE CRUCIAL DEBUG LOG ---
+    console.log('Attempting login with:', formData);
+    // ----------------------------------
+
     try {
       await login(formData.email, formData.password);
     } finally {
