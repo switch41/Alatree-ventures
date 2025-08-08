@@ -81,12 +81,12 @@ router.get('/tasks/:id', async (req, res) => {
 // @route   POST /api/admin/tasks
 // @access  Admin
 router.post('/tasks', [
-  body('title').trim().isLength({ min: 1, max: 100 }).withMessage('Title is required and max 100 chars'),
-  body('description').trim().isLength({ min: 1, max: 500 }).withMessage('Description is required and max 500 chars'),
-  body('type').isIn(['survey', 'quiz', 'challenge', 'event', 'submission']).withMessage('Invalid task type'),
-  body('category').trim().isLength({ min: 1 }).withMessage('Category is required'),
-  body('points').isNumeric().isInt({ min: 0 }).withMessage('Points must be a non-negative integer'),
-  body('duration').isNumeric().isInt({ min: 1 }).withMessage('Duration must be a positive integer')
+  body('title').trim().isLength({ min: 1, max: 100 }),
+  body('description').trim().isLength({ min: 1, max: 500 }),
+  body('type').isIn(['survey', 'quiz', 'challenge', 'event', 'submission']),
+  body('category').trim().isLength({ min: 1 }),
+  body('points').isNumeric().isInt({ min: 0 }),
+  body('duration').isNumeric().isInt({ min: 1 })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -116,12 +116,12 @@ router.post('/tasks', [
 // @route   PUT /api/admin/tasks/:id
 // @access  Admin
 router.put('/tasks/:id', [
-  body('title').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Title must be between 1 and 100 characters'),
-  body('description').optional().trim().isLength({ min: 1, max: 500 }).withMessage('Description must be between 1 and 500 characters'),
-  body('type').optional().isIn(['survey', 'quiz', 'challenge', 'event', 'submission']).withMessage('Invalid task type'),
-  body('category').optional().trim().isLength({ min: 1 }).withMessage('Category is required'),
-  body('points').optional().isNumeric().isInt({ min: 0 }).withMessage('Points must be a non-negative integer'),
-  body('duration').optional().isNumeric().isInt({ min: 1 }).withMessage('Duration must be a positive integer')
+  body('title').optional().trim().isLength({ min: 1, max: 100 }),
+  body('description').optional().trim().isLength({ min: 1, max: 500 }),
+  body('type').optional().isIn(['survey', 'quiz', 'challenge', 'event', 'submission']),
+  body('category').optional().trim().isLength({ min: 1 }),
+  body('points').optional().isNumeric().isInt({ min: 0 }),
+  body('duration').optional().isNumeric().isInt({ min: 1 })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -218,13 +218,10 @@ router.get('/itineraries', async (req, res) => {
 // @route   POST /api/admin/itineraries
 // @access  Admin
 router.post('/itineraries', [
-  body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Name is required and max 100 chars'),
-  body('description').trim().isLength({ min: 1, max: 500 }).withMessage('Description is required and max 500 chars'),
-  body('type').isIn(['daily', 'weekly', 'monthly', 'campaign', 'event']).withMessage('Invalid itinerary type'),
-  body('schedule.startDate').isISO8601().withMessage('Valid start date is required'),
-  body('tasks').isArray().withMessage('Tasks must be an array'),
-  body('tasks.*.task').isMongoId().withMessage('Invalid task ID in tasks array'),
-  body('tasks.*.order').isInt({ min: 1 }).withMessage('Task order must be a positive integer')
+  body('name').trim().isLength({ min: 1, max: 100 }),
+  body('description').trim().isLength({ min: 1, max: 500 }),
+  body('type').isIn(['daily', 'weekly', 'monthly', 'campaign', 'event']),
+  body('schedule.startDate').isISO8601()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -252,67 +249,6 @@ router.post('/itineraries', [
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
-
-// @desc    Update itinerary
-// @route   PUT /api/admin/itineraries/:id
-// @access  Admin
-router.put('/itineraries/:id', [
-  body('name').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Name must be between 1 and 100 characters'),
-  body('description').optional().trim().isLength({ min: 1, max: 500 }).withMessage('Description must be between 1 and 500 characters'),
-  body('type').optional().isIn(['daily', 'weekly', 'monthly', 'campaign', 'event']).withMessage('Invalid itinerary type'),
-  body('schedule.startDate').optional().isISO8601().withMessage('Valid start date is required'),
-  body('tasks').optional().isArray().withMessage('Tasks must be an array'),
-  body('tasks.*.task').optional().isMongoId().withMessage('Invalid task ID in tasks array'),
-  body('tasks.*.order').optional().isInt({ min: 1 }).withMessage('Task order must be a positive integer')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const itinerary = await Itinerary.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).populate([
-      { path: 'createdBy', select: 'name email' },
-      { path: 'tasks.task', select: 'title type points' }
-    ]);
-
-    if (!itinerary) {
-      return res.status(404).json({ success: false, message: 'Itinerary not found' });
-    }
-
-    res.json({ success: true, data: itinerary });
-  } catch (error) {
-    console.error('Update itinerary error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// @desc    Delete itinerary
-// @route   DELETE /api/admin/itineraries/:id
-// @access  Admin
-router.delete('/itineraries/:id', async (req, res) => {
-  try {
-    const itinerary = await Itinerary.findByIdAndDelete(req.params.id);
-
-    if (!itinerary) {
-      return res.status(404).json({ success: false, message: 'Itinerary not found' });
-    }
-
-    res.json({ success: true, message: 'Itinerary deleted successfully' });
-  } catch (error) {
-    console.error('Delete itinerary error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
 
 // ============ USERS CRUD ============ 
 
@@ -410,7 +346,7 @@ router.post('/users', [
 // @route   PUT /api/admin/users/:id/role
 // @access  Admin
 router.put('/users/:id/role', [
-  body('role').isIn(['admin', 'staff', 'user']).withMessage('Invalid role')
+  body('role').isIn(['admin', 'staff', 'user'])
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -439,45 +375,15 @@ router.put('/users/:id/role', [
   }
 });
 
-// @desc    Delete user
-// @route   DELETE /api/admin/users/:id
-// @access  Admin
-router.delete('/users/:id', async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    res.json({ success: true, message: 'User deleted successfully' });
-  } catch (error) {
-    console.error('Delete user error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-
 // ============ ANALYTICS & REPORTING ============ 
 
 // @desc    Get analytics report
 // @route   GET /api/admin/report
 // @access  Admin
 router.get('/report', [
-  query('cycleId').optional().isMongoId().withMessage('Invalid Cycle ID'),
-  query('startDate').optional().isISO8601().withMessage('Invalid start date format'),
-  query('endDate').optional().isISO8601().withMessage('Invalid end date format')
+  query('cycleId').optional().isMongoId()
 ], async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
     const { cycleId, startDate, endDate } = req.query;
     
     let dateFilter = {};
@@ -567,7 +473,7 @@ router.get('/scheduler', async (req, res) => {
 // @route   PUT /api/admin/scheduler/:jobName
 // @access  Admin
 router.put('/scheduler/:jobName', [
-  body('enabled').isBoolean().withMessage('Enabled status must be a boolean')
+  body('enabled').isBoolean()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
