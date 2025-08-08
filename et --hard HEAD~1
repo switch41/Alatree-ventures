@@ -1,0 +1,97 @@
+[33mcommit 1a92c4c3d8c870290b23e5cae9bcfa1cbfda68fc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 23:01:53 2025 +0530
+
+    fix: update main entry and script paths in package.json for consistency
+
+[33mcommit c65b20c8bfe2ca96f70847d52171bfbaa9f514ae[m
+Merge: 79a6666 64c8162
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 23:01:35 2025 +0530
+
+    Merge branch 'main' of https://github.com/switch41/Alatree-venturesc
+
+[33mcommit 79a66669b66414cf507d01ae19731b7b60d7aa6c[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 23:00:38 2025 +0530
+
+    feat(api): initialize admin server with CRUD operations for tasks, itineraries, and users
+    
+    - Added package.json for server dependencies and scripts.
+    - Implemented admin routes for managing tasks, itineraries, and users with validation.
+    - Integrated authentication middleware for secure access to admin routes.
+    - Created scheduler service for managing scheduled jobs like prize draws and notifications.
+    - Added analytics and reporting endpoints for admin insights.
+    - Configured Vercel deployment settings for the application.
+
+[33mcommit 64c81625433e90a1fe40bb04f3a1635c72ee0a7a[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 21:42:39 2025 +0530
+
+    fix: remove redundant install-all script from package.json for clarity
+
+[33mcommit fa87cc3a319baa3fce308cbc975442f11fbc2659[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 21:37:57 2025 +0530
+
+    fix: streamline package.json scripts by removing duplicates and enhancing clarity
+
+[33mcommit 87eadbffa27fb482b0dddc00c8db191a79b6c56b[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 21:25:36 2025 +0530
+
+    fix: refine comments and improve code readability in server index.js
+
+[33mcommit cd4c00fdbea0186a2709fb2adfd74156382283ab[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 21:16:17 2025 +0530
+
+    fix: downgrade typescript version from 5.9.2 to 4.9.5 and update node engine requirement
+
+[33mcommit 20611f34146d25bc39c2a7b0cc4202b13b1cba07[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 20:16:54 2025 +0530
+
+    fix: update package.json scripts and enhance server index.js for static asset serving
+
+[33mcommit b343fd4d34e363b6fa80d50c92a10ce6b3aad2e7[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 19:58:15 2025 +0530
+
+    fix: remove custom validation messages for task and itinerary routes
+
+[33mcommit cf451ce91570141aebbb4abc556bf3e196bdabd0[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 19:57:57 2025 +0530
+
+    fix: enhance validation messages for task and itinerary routes
+
+[33mcommit ccb2779391689aad1099c3614ad91cc43089638b[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 19:40:46 2025 +0530
+
+    chore: set up initial server configuration with middleware and database connection
+
+[33mcommit 6c5f5e1d5c40fc4d63b3491b62e5679d24ab7290[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 12:47:43 2025 +0530
+
+    fix: refine admin user creation logic to only create if it doesn't exist
+
+[33mcommit 947ec389d28b43de24e5b924f3cf09d760aeafdd[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 12:40:57 2025 +0530
+
+    fix: correct email regex and remove unnecessary backslash in UserForm.js
+
+[33mcommit 03d5b35966bc0083a12491d0ad449d12c512fe25[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 11:50:16 2025 +0530
+
+    updated README.md
+
+[33mcommit ee0c355969c8c12447b4c13badb54b7ad6402b07[m
+Author: switch41 <kushalparihar013@gmail.com>
+Date:   Fri Aug 8 11:34:28 2025 +0530
+
+    First commit

@@ -2,16 +2,16 @@
   "name": "admin-task-management-system",
   "version": "1.0.0",
   "description": "MERN stack admin panel for task management with analytics and scheduling",
-  "main": "api/index.js",
+  "main": "server/index.js",
   "scripts": {
     "build": "cd client && npm install && npm run build",
-    "start": "cd api && npm install && node index.js",
+    "start": "cd server && npm install && node index.js",
     "dev": "concurrently \"npm run server-dev\" \"npm run client-dev\"",
-    "server-dev": "cd api && npm run dev",
+    "server-dev": "cd server && npm run dev",
     "client-dev": "cd client && npm start",
     "build-client": "cd client && npm run build",
-    "start-server": "cd api && npm start",
-    "install-all": "npm install && cd api && npm install && cd ../client && npm install"
+    "start-server": "cd server && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
   },
   "dependencies": {
     "concurrently": "^7.6.0"
