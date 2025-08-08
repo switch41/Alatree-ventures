@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Clock, 
-  Play, 
-  Pause, 
-  CheckCircle, 
+import {
+  Clock,
+  Play,
+  Pause,
+  CheckCircle,
   AlertCircle,
   Calendar,
-  Settings
+  Settings,
+  Loader2 // Added for specific button loading state
 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -17,6 +18,7 @@ const Scheduler = () => {
   const { t } = useTranslation();
   const [schedulerStatus, setSchedulerStatus] = useState({});
   const [loading, setLoading] = useState(true);
+  const [togglingJob, setTogglingJob] = useState(null); // State to track which job is currently being toggled
 
   useEffect(() => {
     fetchSchedulerStatus();
@@ -28,31 +30,66 @@ const Scheduler = () => {
       const response = await axios.get('/api/admin/scheduler');
       if (response.data.success) {
         setSchedulerStatus(response.data.data);
+      } else {
+        toast.error(response.data.message || 'Failed to fetch scheduler status.');
       }
     } catch (error) {
       console.error('Failed to fetch scheduler status:', error);
-      toast.error('Failed to fetch scheduler status');
+      toast.error('Error fetching scheduler status. Please check server connection and logs.');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleJob = async (jobName, enabled) => {
+  const toggleJob = async (jobKey, currentEnabledStatus) => {
+    setTogglingJob(jobKey); // Set the job key to indicate it's being toggled
+
+    // Optimistic UI update: immediately change the local state
+    setSchedulerStatus(prevStatus => ({
+      ...prevStatus,
+      [jobKey]: {
+        ...prevStatus[jobKey],
+        enabled: !currentEnabledStatus,
+      }
+    }));
+
     try {
-      const response = await axios.put(`/api/admin/scheduler/${jobName}`, {
-        enabled: !enabled
+      const response = await axios.put(`/api/admin/scheduler/${jobKey}`, {
+        enabled: !currentEnabledStatus
       });
 
       if (response.data.success) {
         toast.success(response.data.message);
+        // Re-fetch to ensure consistency, especially for 'nextRun' which is calculated server-side
         fetchSchedulerStatus();
+      } else {
+        // Revert optimistic update if API call failed
+        setSchedulerStatus(prevStatus => ({
+          ...prevStatus,
+          [jobKey]: {
+            ...prevStatus[jobKey],
+            enabled: currentEnabledStatus, // Revert to original status
+          }
+        }));
+        toast.error(response.data.message || 'Failed to toggle job.');
       }
     } catch (error) {
       console.error('Failed to toggle job:', error);
-      toast.error('Failed to toggle job');
+      // Revert optimistic update on network or server error
+      setSchedulerStatus(prevStatus => ({
+        ...prevStatus,
+        [jobKey]: {
+          ...prevStatus[jobKey],
+          enabled: currentEnabledStatus, // Revert to original status
+        }
+      }));
+      toast.error('Error toggling job. Please check server connection and logs.');
+    } finally {
+      setTogglingJob(null); // Clear the toggling state
     }
   };
 
+  // Helper function to get icon based on job name
   const getJobIcon = (jobName) => {
     switch (jobName) {
       case 'draw':
@@ -66,6 +103,7 @@ const Scheduler = () => {
     }
   };
 
+  // Helper function to get status badge based on enabled status
   const getStatusBadge = (enabled) => {
     return (
       <span className={`badge ${enabled ? 'badge-success' : 'badge-danger'} flex items-center space-x-1`}>
@@ -75,6 +113,7 @@ const Scheduler = () => {
     );
   };
 
+  // Show a full-page spinner if initial data is loading
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -83,6 +122,7 @@ const Scheduler = () => {
     );
   }
 
+  // Render the main scheduler content
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -150,7 +190,7 @@ const Scheduler = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-medium text-gray-900">Scheduled Jobs</h2>
         </div>
-        
+
         <div className="divide-y divide-gray-200">
           {Object.entries(schedulerStatus).map(([jobKey, job]) => (
             <div key={jobKey} className="p-6">
@@ -161,11 +201,11 @@ const Scheduler = () => {
                   }`}>
                     {getJobIcon(jobKey)}
                   </div>
-                  
+
                   <div className="flex-1">
                     <h3 className="text-lg font-medium text-gray-900">{job.name}</h3>
                     <p className="text-sm text-gray-500">{job.description}</p>
-                    
+
                     <div className="mt-2 space-y-1">
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span>
@@ -177,7 +217,7 @@ const Scheduler = () => {
                           </span>
                         )}
                       </div>
-                      
+
                       {job.nextRun && (
                         <div className="text-sm text-gray-600">
                           <strong>Next Run:</strong> {new Date(job.nextRun).toLocaleString()}
@@ -189,12 +229,15 @@ const Scheduler = () => {
 
                 <div className="flex items-center space-x-4">
                   {getStatusBadge(job.enabled)}
-                  
+
                   <button
                     onClick={() => toggleJob(jobKey, job.enabled)}
-                    className={`btn-${job.enabled ? 'secondary' : 'primary'} flex items-center space-x-2`}
+                    disabled={togglingJob === jobKey} 
+                    className={`btn-${job.enabled ? 'secondary' : 'primary'} flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    {job.enabled ? (
+                    {togglingJob === jobKey ? (
+                      <Loader2 className="w-4 h-4 animate-spin" /> // Show spinner when toggling
+                    ) : job.enabled ? (
                       <>
                         <Pause className="w-4 h-4" />
                         <span>Disable</span>
@@ -227,7 +270,7 @@ const Scheduler = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
               <div>
@@ -237,7 +280,7 @@ const Scheduler = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <Settings className="w-5 h-5 text-gray-600 mt-0.5" />
               <div>
@@ -260,7 +303,7 @@ const Scheduler = () => {
               </div>
               <span className="badge badge-success">Running</span>
             </div>
-            
+
             <div className="flex items-center justify-between p-3 bg-blue-50 rounded-md">
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5 text-blue-600" />
@@ -270,7 +313,7 @@ const Scheduler = () => {
                 {Object.values(schedulerStatus).filter(job => job.enabled).length} active
               </span>
             </div>
-            
+
             <div className="p-3 bg-gray-50 rounded-md">
               <div className="text-sm text-gray-600">
                 <strong>Server Time:</strong> {new Date().toLocaleString()}
@@ -283,7 +326,7 @@ const Scheduler = () => {
         </div>
       </div>
 
-      {Object.keys(schedulerStatus).length === 0 && (
+      {Object.keys(schedulerStatus).length === 0 && !loading && (
         <div className="text-center py-12">
           <Clock className="w-12 h-12 mx-auto text-gray-400 mb-4" />
           <div className="text-gray-500">
