@@ -6,6 +6,7 @@ const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const schedulerService = require('./services/schedulerService');
+const path = require('path'); // Add this import
 require('dotenv').config();
 
 const app = express();
@@ -14,13 +15,13 @@ const app = express();
 connectDB();
 
 // Trust proxy for rate limiting (e.g., when deployed behind a load balancer or in WebContainer)
-app.set('trust proxy', 1); // Add this line
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-frontend-domain.com' 
+    ? 'https://your-frontend-domain.com' // Replace with your actual Render frontend URL in production
     : 'http://localhost:3000',
   credentials: true
 }));
@@ -36,9 +37,20 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static(path.join(__dirname, '../client/build')));
+
+  // Any request that doesn't match an API route will serve the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+  });
+}
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -58,10 +70,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
-});
+// 404 handler (only for non-production or if not caught by static serve)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('*', (req, res) => {
+    res.status(404).json({ success: false, message: 'Route not found' });
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
