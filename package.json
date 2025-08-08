@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "description": "MERN stack admin panel for task management with analytics and scheduling",
   "main": "server/index.js",
-  "scripts": {
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "build": "cd client && npm install && npm run build",
-    "start": "cd server && npm install && node index.js",
-    "dev": "concurrently \"npm run server-dev\" \"npm run client-dev\"",
-    "server-dev": "cd server && npm run dev",
-    "client-dev": "cd client && npm start"
-  },
+"scripts": {
+  "build": "cd client && npm install && npm run build",
+  "start": "cd server && npm install && node index.js",
+  "dev": "concurrently \"npm run server-dev\" \"npm run client-dev\"",
+  "server-dev": "cd server && npm run dev",
+  "client-dev": "cd client && npm start"
+},
   "dependencies": {},
   "devDependencies": {},
   "keywords": ["admin", "task-management", "MERN", "analytics"],
