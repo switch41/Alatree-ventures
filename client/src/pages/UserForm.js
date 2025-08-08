@@ -45,7 +45,7 @@ const UserForm = () => {
       let response;
       if (isEdit) {
         // This part would be for updating an existing user
-        // response = await axios.put(`/api/admin/users/${id}`, data);
+        // response = await axios.put(`/api/admin/users/${id}`, data);\
         toast.error('User editing is not yet implemented.');
         setSubmitting(false);
         return;
@@ -126,7 +126,7 @@ const UserForm = () => {
                     {...register('email', { 
                       required: 'Email is required',
                       pattern: {
-                        value: /^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$/,
+                        value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                         message: 'Invalid email address'
                       }
                     })}
@@ -241,4 +241,3 @@ const UserForm = () => {
 };
 
 export default UserForm;
-    
